@@ -134,3 +134,6 @@ dmypy.json
 *.swo
 *~
 .DS_Store
+
+# Ruff Linter
+.ruff_cache/
