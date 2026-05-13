@@ -1,60 +1,63 @@
-version: "3.9"
-
 services:
-
-  # ── PostgreSQL database ───────────────────────────────────────────────────
-  db:
-    image: postgres:16-alpine
-    container_name: blog_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: blog_user
-      POSTGRES_PASSWORD: blog_pass
-      POSTGRES_DB: blog
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  # ==========================================
+  # 1. AUTH SERVICE (Port: 8001)
+  # ==========================================
+  auth_api:
+    build: 
+      context: ./auth_service
+    container_name: auth_api
     ports:
-      - "5433:5432"
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://auth_user:auth_pass@auth_db:5432/auth_db
+      - SECRET_KEY=changeme-secret-key
+    depends_on:
+      auth_db:
+        condition: service_healthy
+
+  auth_db:
+    image: postgres:16-alpine
+    container_name: auth_db
+    environment:
+      - POSTGRES_USER=auth_user
+      - POSTGRES_PASSWORD=auth_pass
+      - POSTGRES_DB=auth_db
+    ports:
+      - "5434:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U blog_user -d blog"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
-  # ── FastAPI application ───────────────────────────────────────────────────
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # ==========================================
+  # 2. BLOG SERVICE (Port: 8002)
+  # ==========================================
+  blog_api:
+    build: 
+      context: ./blog_service
     container_name: blog_api
-    restart: unless-stopped
-    environment:
-      DATABASE_URL: postgresql://blog_user:blog_pass@db:5432/blog
-      SECRET_KEY: changeme-super-secret-key
     ports:
-      - "8000:8000"
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://blog_user:blog_pass@blog_db:5432/blog_db
+      - SECRET_KEY=changeme-secret-key
+      - AUTH_SERVICE_URL=http://auth_api:8000  # URL untuk komunikasi antar-layanan
     depends_on:
-      db:
+      blog_db:
         condition: service_healthy
-    volumes:
-      # live-reload: mount source so changes reflect without rebuild
-      - ./app:/app/app
 
-  # ── pgAdmin (optional, web-based DB GUI) ──────────────────────────────────
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: blog_pgadmin
-    restart: unless-stopped
+  blog_db:
+    image: postgres:16-alpine
+    container_name: blog_db
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@blog.local
-      PGADMIN_DEFAULT_PASSWORD: admin
+      - POSTGRES_USER=blog_user
+      - POSTGRES_PASSWORD=blog_pass
+      - POSTGRES_DB=blog_db
     ports:
-      - "5050:80"
-    depends_on:
-      - db
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-
-volumes:
-  postgres_data:
-  pgadmin_data:
+      - "5433:5432" # Diekspos ke port 5433 di host agar tidak bentrok dengan auth_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blog_user -d blog_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
