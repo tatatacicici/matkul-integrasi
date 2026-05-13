@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 
 from app.core.database import get_db
 from app.services.auth_service import login_user, refresh_user_token
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -18,7 +19,8 @@ class RefreshRequest(BaseModel):
 
 
 @router.post("/login")
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     """
     POST /auth/login
     Returns access_token (2h) + refresh_token (7d).
@@ -28,7 +30,8 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/refresh")
-def refresh(payload: RefreshRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def refresh(request: Request, payload: RefreshRequest, db: Session = Depends(get_db)):
     """
     POST /auth/refresh
     Exchange expired access_token for a new one using refresh_token.

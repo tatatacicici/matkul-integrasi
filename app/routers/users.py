@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -6,12 +6,14 @@ from app.core.security import hash_password
 from app.models.models import User
 from app.schemas.schemas import UserCreate, UserOut
 from app.middleware.auth import get_current_user
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def create_user(payload: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def create_user(request: Request, payload: UserCreate, db: Session = Depends(get_db)):
     """POST /users — register. Public."""
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")

@@ -22,7 +22,7 @@ def build_post_out(post: Post) -> PostOut:
         status=post.status,
         content=post.content,
         author=AuthorOut.from_orm_model(post.author) if post.author else None,
-        link=f"/posts/{post.id}",
+        link=f"/api/v1/posts/{post.id}",
     )
 
 
@@ -82,7 +82,7 @@ def get_post(post_id: int, db: Session = Depends(get_db)):
         status=post.status,
         content=post.content,
         author=AuthorOut.from_orm_model(post.author) if post.author else None,
-        link=f"/posts/{post.id}",
+        link=f"/api/v1/posts/{post.id}",
         comments=[build_comment_out(c) for c in post.comments],
     )
 
