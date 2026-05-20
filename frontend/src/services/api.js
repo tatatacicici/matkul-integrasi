@@ -49,10 +49,10 @@ export const authService = {
 };
 
 export const postService = {
-  getPosts: (skip = 0, limit = 10) => api.get(`/posts/?skip=${skip}&limit=${limit}`),
+  getPosts: (page = 1, pageSize = 10) => api.get(`/posts/?page=${page}&page_size=${pageSize}`),
   getPost: (id) => api.get(`/posts/${id}`),
   createPost: (data) => api.post('/posts/', data),
-  updatePost: (id, data) => api.put(`/posts/${id}`, data),
+  updatePost: (id, data) => api.patch(`/posts/${id}`, data),
   deletePost: (id) => api.delete(`/posts/${id}`),
 };
 
