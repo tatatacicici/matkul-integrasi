@@ -1,4 +1,4 @@
-.PHONY: setup compile install dev format lint clean up down logs
+.PHONY: setup compile install dev format lint clean up down logs migrate migration db-status
 
 # Setuptools and pip-tools are equivalent to Composer
 setup:
@@ -45,3 +45,28 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 	rm -rf .pytest_cache
+
+# ── Database Migration (Alembic) ─────────────────────────────────────────────
+# URL untuk koneksi lokal (lewat port forwarding Docker)
+DB_URL = postgresql://blog_user:blog_pass@localhost:5433/blog
+
+# Terapkan semua migrasi ke database
+migrate:
+	DATABASE_URL=$(DB_URL) .venv/bin/alembic upgrade head
+
+# Generate file migrasi baru dari perubahan model
+# Usage: make migration m="add_category_to_posts"
+migration:
+	DATABASE_URL=$(DB_URL) .venv/bin/alembic revision --autogenerate -m "$(m)"
+
+# Cek status migrasi saat ini
+db-status:
+	@echo "── Current Revision ──"
+	@DATABASE_URL=$(DB_URL) .venv/bin/alembic current
+	@echo ""
+	@echo "── Migration History ──"
+	@DATABASE_URL=$(DB_URL) .venv/bin/alembic history --verbose
+
+# Rollback migrasi 1 langkah
+db-rollback:
+	DATABASE_URL=$(DB_URL) .venv/bin/alembic downgrade -1
