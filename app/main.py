@@ -12,6 +12,7 @@ from app.core.limiter import limiter
 from app.core.database import engine
 from app.models.models import Base
 from app.routers import posts, comments, users, auth
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # ── Security headers middleware ───────────────────────────────────────────────
@@ -53,6 +54,13 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 app.add_middleware(SecurityHeadersMiddleware)
 
 # ── Custom validation error handler (cleaner 422 response) ───────────────────
