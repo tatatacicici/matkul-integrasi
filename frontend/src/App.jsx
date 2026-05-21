@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Posts from './pages/Posts';
+import PublicBlog from './pages/PublicBlog';
 
 // A wrapper for protected routes
 const ProtectedRoute = ({ children }) => {
@@ -16,9 +17,13 @@ const ProtectedRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<PublicBlog />} />
       <Route path="/login" element={<Login />} />
+      
+      {/* Protected Routes */}
       <Route 
-        path="/" 
+        path="/dashboard" 
         element={
           <ProtectedRoute>
             <Dashboard />

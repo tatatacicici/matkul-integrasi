@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,8 +17,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(username, password);
-      navigate('/');
+      await login(email, password);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to login. Please check your credentials.');
     } finally {
@@ -43,18 +43,18 @@ const Login = () => {
             )}
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username or Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   required
                   className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
-                  placeholder="admin"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>

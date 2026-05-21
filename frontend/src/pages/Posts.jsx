@@ -8,11 +8,11 @@ const Posts = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [status, setStatus] = useState('published');
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchPosts();
@@ -34,18 +34,43 @@ const Posts = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await postService.createPost({ title, content, status });
-      setIsModalOpen(false);
-      setTitle('');
-      setContent('');
-      setStatus('published');
+      if (editingId) {
+        await postService.updatePost(editingId, { title, content, status });
+      } else {
+        await postService.createPost({ title, content, status });
+      }
+      closeModal();
       fetchPosts(); // Refresh list
     } catch (error) {
-      console.error("Failed to create post:", error);
-      alert("Failed to create post");
+      console.error(`Failed to ${editingId ? 'update' : 'create'} post:`, error);
+      alert(`Failed to ${editingId ? 'update' : 'create'} post`);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openEditModal = (post) => {
+    setEditingId(post.id);
+    setTitle(post.title);
+    setContent(post.content);
+    setStatus(post.status);
+    setIsModalOpen(true);
+  };
+
+  const openCreateModal = () => {
+    setEditingId(null);
+    setTitle('');
+    setContent('');
+    setStatus('published');
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setTitle('');
+    setContent('');
+    setStatus('published');
   };
 
   const handleDelete = async (id) => {
@@ -77,7 +102,7 @@ const Posts = () => {
             <p className="text-gray-500 mt-1">Create, edit, and delete your blog posts.</p>
           </div>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={openCreateModal}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus size={18} /> Create Post
@@ -120,7 +145,7 @@ const Posts = () => {
                         {post.content}
                       </td>
                       <td className="px-6 py-4 text-gray-500">
-                        {post.author?.username || 'Unknown'}
+                        {post.author?.full_name || 'Unknown'}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getStatusColor(post.status)}`}>
@@ -129,7 +154,7 @@ const Posts = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
+                          <button onClick={() => openEditModal(post)} className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
                             <Edit2 size={16} />
                           </button>
                           <button onClick={() => handleDelete(post.id)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Delete">
@@ -146,13 +171,13 @@ const Posts = () => {
         </div>
       </div>
 
-      {/* Create Post Modal */}
+      {/* Create / Edit Post Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Create New Post</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-lg font-bold text-gray-900">{editingId ? 'Edit Post' : 'Create New Post'}</h3>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={20} />
               </button>
             </div>
@@ -192,7 +217,7 @@ const Posts = () => {
               <div className="pt-4 flex justify-end gap-3">
                 <button 
                   type="button" 
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
@@ -202,7 +227,7 @@ const Posts = () => {
                   disabled={submitting}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-70"
                 >
-                  {submitting ? 'Creating...' : 'Create Post'}
+                  {submitting ? 'Saving...' : (editingId ? 'Update Post' : 'Create Post')}
                 </button>
               </div>
             </form>

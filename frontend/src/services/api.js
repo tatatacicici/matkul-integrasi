@@ -33,15 +33,11 @@ api.interceptors.response.use(
 );
 
 export const authService = {
-  login: (username, password) => {
-    const formData = new URLSearchParams();
-    formData.append('username', username);
-    formData.append('password', password);
-    
-    return api.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+  login: (email, password) => {
+    // The FastAPI backend expects { email, password } as JSON, not FormData
+    return api.post('/auth/login', {
+      email: email,
+      password: password
     });
   },
   register: (data) => api.post('/users/', data),
@@ -57,8 +53,9 @@ export const postService = {
 };
 
 export const commentService = {
-  getComments: (postId, skip = 0, limit = 10) => api.get(`/comments/?post_id=${postId}&skip=${skip}&limit=${limit}`),
+  getComments: (postId, page = 1, pageSize = 10) => api.get(`/comments/?post_id=${postId}&page=${page}&page_size=${pageSize}`),
   createComment: (data) => api.post('/comments/', data),
+  updateComment: (id, data) => api.patch(`/comments/${id}`, data),
   deleteComment: (id) => api.delete(`/comments/${id}`),
 };
 

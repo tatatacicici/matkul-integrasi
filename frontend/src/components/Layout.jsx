@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Posts', href: '/posts', icon: FileText },
     { name: 'Comments', href: '/comments', icon: MessageSquare },
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -75,8 +75,16 @@ const Layout = ({ children }) => {
               <Bell size={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-sm font-semibold shadow-md">
-              {user?.username?.[0]?.toUpperCase() || 'U'}
+            <div className="flex items-center gap-2 border-l border-gray-200 pl-3 ml-1">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-sm font-semibold shadow-md">
+                {user?.full_name?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <button 
+                onClick={logout}
+                className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors hidden sm:block"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </header>

@@ -41,7 +41,7 @@ function Dashboard() {
       <div className="space-y-6">
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {user?.username || 'User'}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {user?.full_name || 'User'}</h2>
             <p className="text-gray-500 mt-1">Here is the overview of your API project.</p>
           </div>
           <button className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
@@ -102,7 +102,7 @@ function Dashboard() {
                         {post.title}
                       </td>
                       <td className="px-6 py-4 text-gray-500">
-                        {post.author?.username || 'Unknown'}
+                        {post.author?.full_name || 'Unknown'}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getStatusColor(post.status)}`}>
