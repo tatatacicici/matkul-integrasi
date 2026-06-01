@@ -128,3 +128,7 @@ dmypy.json
 
 # Ruff Linter
 .ruff_cache/
+
+# Frontend/View files
+frontend/
+view/
