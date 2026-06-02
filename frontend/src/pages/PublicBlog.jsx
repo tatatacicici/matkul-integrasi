@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, User, Calendar, ArrowRight, LogOut } from 'lucide-react';
+import { BookOpen, User, ArrowRight, LogOut } from 'lucide-react';
 import { postService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -128,9 +128,9 @@ const PublicBlog = () => {
                   </p>
                   
                   <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
-                    <button className="text-blue-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <Link to={`/post/${post.id}`} className="text-blue-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       Read more <ArrowRight size={16} />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </article>

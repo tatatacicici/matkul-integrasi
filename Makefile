@@ -1,4 +1,4 @@
-.PHONY: setup compile install dev format lint clean up down logs migrate migration db-status
+.PHONY: setup compile install dev format lint clean up down logs migrate migration db-status test-e2e
 
 # Setuptools and pip-tools are equivalent to Composer
 setup:
@@ -70,3 +70,8 @@ db-status:
 # Rollback migrasi 1 langkah
 db-rollback:
 	DATABASE_URL=$(DB_URL) .venv/bin/alembic downgrade -1
+
+# ── E2E Testing (Selenium) ──────────────────────────────────────────────────
+# Pastikan Docker services (make up) dan frontend (cd frontend && npm run dev) sudah berjalan
+test-e2e:
+	.venv/bin/pytest tests/qa/ -v --no-header -x

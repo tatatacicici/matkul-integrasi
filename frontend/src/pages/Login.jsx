@@ -85,6 +85,13 @@ const Login = () => {
               {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
             </button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Don't have an account?{' '}
+            <a href="/register" id="link-to-register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              Create one here
+            </a>
+          </p>
         </div>
       </div>
     </div>

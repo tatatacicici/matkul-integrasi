@@ -21,11 +21,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Token might be expired or invalid
-      localStorage.removeItem('token');
-      // Redirect to login only if not already on login page
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      // Don't clear token if the 401 is from a failed login attempt
+      if (!error.config.url.includes('/auth/login')) {
+        localStorage.removeItem('token');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
@@ -42,6 +43,7 @@ export const authService = {
   },
   register: (data) => api.post('/users/', data),
   getMe: () => api.get('/users/me'),
+  updateMe: (data) => api.patch('/users/me', data),
 };
 
 export const postService = {
@@ -53,7 +55,11 @@ export const postService = {
 };
 
 export const commentService = {
-  getComments: (postId, page = 1, pageSize = 10) => api.get(`/comments/?post_id=${postId}&page=${page}&page_size=${pageSize}`),
+  getComments: (postId, page = 1, pageSize = 10) => {
+    const params = new URLSearchParams({ page, page_size: pageSize });
+    if (postId) params.append('post_id', postId);
+    return api.get(`/comments/?${params.toString()}`);
+  },
   createComment: (data) => api.post('/comments/', data),
   updateComment: (id, data) => api.patch(`/comments/${id}`, data),
   deleteComment: (id) => api.delete(`/comments/${id}`),

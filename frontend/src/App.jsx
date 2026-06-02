@@ -2,9 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Posts from './pages/Posts';
 import PublicBlog from './pages/PublicBlog';
+import PostDetail from './pages/PostDetail';
+import Comments from './pages/Comments';
+import Settings from './pages/Settings';
 
 // A wrapper for protected routes
 const ProtectedRoute = ({ children }) => {
@@ -20,6 +24,8 @@ function AppRoutes() {
       {/* Public Routes */}
       <Route path="/" element={<PublicBlog />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/post/:id" element={<PostDetail />} />
       
       {/* Protected Routes */}
       <Route 
@@ -35,6 +41,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Posts />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/comments" 
+        element={
+          <ProtectedRoute>
+            <Comments />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/settings" 
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         } 
       />
