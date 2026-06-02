@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements.txt pyproject.toml
 #
+alembic==1.18.4
+    # via blog-api (pyproject.toml)
 annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
@@ -40,6 +42,10 @@ idna==3.13
     #   email-validator
 limits==5.8.0
     # via slowapi
+mako==1.3.12
+    # via alembic
+markupsafe==3.0.3
+    # via mako
 packaging==26.2
     # via limits
 psycopg2-binary==2.9.9
@@ -78,11 +84,14 @@ six==1.17.0
 slowapi==0.1.9
     # via blog-api (pyproject.toml)
 sqlalchemy==2.0.35
-    # via blog-api (pyproject.toml)
+    # via
+    #   alembic
+    #   blog-api (pyproject.toml)
 starlette==0.38.6
     # via fastapi
 typing-extensions==4.15.0
     # via
+    #   alembic
     #   anyio
     #   fastapi
     #   limits
